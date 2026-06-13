@@ -1,0 +1,11 @@
+{
+  "name": "gigaverse-web-export",
+  "version": "1.0.0",
+  "description": "GigaVerse daily static export",
+  "scripts": {
+    "export": "node export.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.0.0"
+  }
+}
