@@ -349,8 +349,8 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
   display: flex; align-items: center; justify-content: center; z-index: 1000; }
 .modal-overlay.hidden { display: none !important; }
 .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
-  padding: 24px 28px; min-width: 420px; max-width: 560px; max-height: 90vh; overflow-y: auto; }
-.modal-box.modal-wide { min-width: 620px; max-width: 800px; }
+  padding: 24px 28px; min-width: min(420px, calc(100vw - 24px)); max-width: 560px; max-height: 90vh; overflow-y: auto; }
+.modal-box.modal-wide { min-width: min(620px, calc(100vw - 24px)); max-width: 800px; }
 .modal-box h2 { font-size: 18px; margin-bottom: 18px; }
 .modal-field { margin-bottom: 14px; display: flex; flex-direction: column; gap: 5px; }
 .modal-field label { font-size: 11px; font-weight: 600; text-transform: uppercase;
@@ -526,11 +526,21 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
 
 /* ── Modal mobile fix ───────────────────────────────────────────────────────── */
 .modal-box {
-  width: calc(100vw - 32px);
+  width: calc(100vw - 24px);
   max-width: 800px;
   max-height: 85vh;
   overflow-y: auto;
+  padding: 16px;
 }
+.modal-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+  padding: 10px 0 2px;
+  margin-top: 16px;
+}
+.modal-post-title { font-size: 17px; }
+.modal-post-body { font-size: 13px; }
 
 /* ── Comment preview in feed cards ─────────────────────────────────────────── */
 .comment-preview-row { display: flex; gap: 6px; align-items: baseline; padding: 4px 0 2px;
