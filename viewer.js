@@ -19,8 +19,8 @@ function relDate(iso) {
     if (diff < 60)    return 'just now';
     if (diff < 3600)  return `${Math.floor(diff/60)}m ago`;
     if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
-    if (diff < 604800) return `${Math.floor(diff/86400)}d ago`;
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+        + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }
 function fmtDate(iso) {
     if (!iso) return '';
