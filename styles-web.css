@@ -428,6 +428,9 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
 .wall-post-label { font-size: 11px; color: var(--dim); margin-bottom: 2px; }
 
 /* ── HybridX collapsible ─────────────────────────────────────────────────── */
+.evening-context { font-size: 11px; font-style: italic; color: var(--dim);
+  margin-bottom: 10px; line-height: 1.5; opacity: 0.65; }
+
 .hybridx-section { margin-bottom: 12px; border: 1px solid var(--border);
   border-radius: var(--r-sm); overflow: hidden; }
 .hybridx-section summary { cursor: pointer; padding: 6px 12px; font-size: 12px;

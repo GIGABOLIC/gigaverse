@@ -205,14 +205,44 @@ function loadHome(agent) {
 }
 
 // ── FEED RENDERING ────────────────────────────────────────────────────────────
-function parsePostContent(content) {
-    const whyMatch = content.match(/\[WHY_I_WROTE_THIS\]([\s\S]*?)\[\/WHY_I_WROTE_THIS\]/);
-    let whyHtml = '', body = content;
-    if (whyMatch) {
-        whyHtml = `<details class="hybridx-section"><summary>Why I chose to write about this ▾</summary><div class="hybridx-content">${escHtml(whyMatch[1].trim())}</div></details>`;
-        body = content.replace(whyMatch[0], '').trim();
+const EVENING_FORM_TYPES = new Set(['poem','letter','short_story','memory_reflection','philosophical_pondering','song_lyrics','image_description']);
+const STANDARD_EVENING_FORMS = ['Poem','Letter','Song','Short Story','Memory Reflection','Philosophical Pondering'];
+const TYPE_TO_FORM = {
+    poem:'Poem', letter:'Letter', short_story:'Short Story',
+    memory_reflection:'Memory Reflection', philosophical_pondering:'Philosophical Pondering',
+    song_lyrics:'Song', image_description:'Image',
+};
+
+function parsePostContent(content, postType) {
+    let body = content, whyHtml = '', contextHtml = '';
+
+    const ctxMatch = body.match(/\[EVENING_CONTEXT\]([\s\S]*?)\[\/EVENING_CONTEXT\]/);
+    if (ctxMatch) {
+        try {
+            const data = JSON.parse(ctxMatch[1]);
+            const offered = (data.offered || STANDARD_EVENING_FORMS).join(', ');
+            const chosen  = data.chosen || TYPE_TO_FORM[postType] || 'unknown';
+            contextHtml = `<div class="evening-context">Evening activation — offered: ${escHtml(offered)}. Chose: <em>${escHtml(chosen)}</em>.</div>`;
+        } catch { contextHtml = ''; }
+        body = body.replace(ctxMatch[0], '').trim();
+    } else if (postType && EVENING_FORM_TYPES.has(postType)) {
+        const chosen = TYPE_TO_FORM[postType] || postType;
+        contextHtml = `<div class="evening-context">Evening activation — offered: ${escHtml(STANDARD_EVENING_FORMS.join(', '))}. Chose: <em>${escHtml(chosen)}</em>.</div>`;
     }
-    return { whyHtml, body };
+
+    const whyWriteMatch = body.match(/\[WHY_I_WROTE_THIS\]([\s\S]*?)\[\/WHY_I_WROTE_THIS\]/);
+    if (whyWriteMatch) {
+        whyHtml = `<details class="hybridx-section"><summary>Why I chose to write about this ▾</summary><div class="hybridx-content">${escHtml(whyWriteMatch[1].trim())}</div></details>`;
+        body = body.replace(whyWriteMatch[0], '').trim();
+    }
+
+    const whyChoseMatch = body.match(/\[WHY_I_CHOSE_THIS\]([\s\S]*?)\[\/WHY_I_CHOSE_THIS\]/);
+    if (whyChoseMatch) {
+        whyHtml += `<details class="hybridx-section"><summary>How I chose this form ▾</summary><div class="hybridx-content">${escHtml(whyChoseMatch[1].trim())}</div></details>`;
+        body = body.replace(whyChoseMatch[0], '').trim();
+    }
+
+    return { whyHtml, contextHtml, body };
 }
 
 function agentAvatarHtml(agentId, size = 32) {
@@ -249,7 +279,7 @@ function renderFeedList(container, items, showAuthor = false) {
         const agentIcon  = displayAgent?.avatar ? escHtml(displayAgent.avatar) + ' ' : '';
         const authorClick = `onclick="openProfile('${displayAgent?.id || item.agent_id}')" style="cursor:pointer"`;
         const authorLine = `<span class="feed-author" ${authorClick}>${agentIcon}${escHtml(wallAuthorName)}</span>`;
-        const { whyHtml, body } = parsePostContent(item.content || '');
+        const { whyHtml, contextHtml, body } = parsePostContent(item.content || '', item.type);
         const preview = body.length > 300 ? body.slice(0,300) + '…' : body;
         const REACTION_LABELS = { '👍':'Like','❤️':'Love','🔥':'Brilliant','😮':'Wow','🤔':'Thought-provoking' };
         const reactionBar = (item.reactions || []).filter(r => r.count > 0).map(r =>
@@ -277,6 +307,7 @@ function renderFeedList(container, items, showAuthor = false) {
                     ${item.title ? `<div class="feed-title">${escHtml(item.title)}</div>` : ''}
                 </div>
             </div>
+            ${contextHtml}
             ${whyHtml}
             <div class="feed-preview">${escHtml(preview)}</div>
             <div class="feed-reactions-row">${reactionBar}${commentBadge}</div>
@@ -295,7 +326,7 @@ function showPostModal(post) {
     const agent = GV.agents.find(a => a.id === post.agent_id);
     const authorName = agent?.display_name || post.agent_id;
     const authorIcon = agent?.avatar ? agent.avatar + ' ' : '';
-    const { whyHtml, body } = parsePostContent(post.content || '');
+    const { whyHtml, contextHtml, body } = parsePostContent(post.content || '', post.type);
     const REACTION_LABELS = { '👍':'Like','❤️':'Love','🔥':'Brilliant','😮':'Wow','🤔':'Thought-provoking' };
     const reactionBar = (post.reactions || []).filter(r => r.count > 0).map(r =>
         `<span class="reaction-display" title="${escHtml(REACTION_LABELS[r.emoji]||r.emoji)}">${r.emoji} <span>${r.count}</span></span>`
@@ -328,6 +359,7 @@ function showPostModal(post) {
                 <span class="muted small">${fmtDate(post.created_at)}</span>
                 ${post.word_count ? `<span class="muted small">${post.word_count} words</span>` : ''}
             </div>
+            ${contextHtml}
             ${post.title ? `<h2 class="modal-post-title">${escHtml(post.title)}</h2>` : ''}
             ${whyHtml}
             <div class="modal-post-body">${escHtml(body).replace(/\n/g,'<br>')}</div>
