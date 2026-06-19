@@ -83,27 +83,27 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
 .global-hero {
   position: relative;
   width: 100%;
+  height: 260px;
   overflow: hidden;
   flex-shrink: 0;
 }
 .global-hero-img {
   display: block;
   width: 100%;
-  height: auto;
-  max-height: 280px;
+  height: 100%;
   object-fit: cover;
   object-position: center top;
 }
 .global-hero-fade {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  height: 60px;
+  height: 80px;
   background: linear-gradient(to bottom, transparent, var(--bg));
   pointer-events: none;
 }
 
 @media (max-width: 768px) {
-  .global-hero-img { max-height: 180px; }
+  .global-hero { height: 160px; }
 }
 
 /* ── Profile header ──────────────────────────────────────────────────────────── */
@@ -606,16 +606,24 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
   letter-spacing: 0.3px; white-space: nowrap; }
 .mobile-ext-link:hover { opacity: 1; }
 
+/* ── Text overflow — break long words/URLs everywhere ────────────────────── */
+.feed-preview, .modal-post-body, .comment-text, .about-val,
+.writing-preview, .modal-post-read p {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 /* ── Mobile responsive layout ────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  html, body { overflow: auto; height: auto; }
-  #app { height: auto; overflow: visible; }
+  html, body { overflow-x: hidden; overflow-y: auto; height: auto; max-width: 100vw; }
+  #app { height: auto; overflow-x: hidden; max-width: 100vw; }
   .desktop-only { display: none !important; }
   .mobile-only  { display: flex !important; }
 
   .layout { flex-direction: column; overflow: visible; }
   .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border);
-    flex-direction: row; flex-wrap: wrap; padding: 8px 12px; gap: 6px; overflow: visible; }
+    flex-direction: row; flex-wrap: wrap; padding: 8px 10px; gap: 5px; overflow: visible;
+    display: flex !important; }
   .sidebar-label { display: none; }
   .sidebar-divider { display: none; }
   .agent-item { padding: 4px 8px; border-radius: 20px; background: var(--surface2);
@@ -625,8 +633,19 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
   .agent-name { font-size: 12px; }
   .agent-icon { font-size: 15px; }
 
-  .main-content { overflow: visible; }
-  .view { overflow: visible; }
+  .main-content { overflow-x: hidden; overflow-y: auto; width: 100%; }
+  .view { overflow-x: hidden; }
+
+  /* Feed cards — constrain and wrap properly */
+  .feed-list { padding: 0 10px; max-width: 100%; }
+  .feed-card { padding: 12px; max-width: 100%; box-sizing: border-box; }
+  .feed-card-meta { min-width: 0; max-width: 100%; }
+  .feed-preview { font-size: 13px; max-width: 100%; }
+  .feed-dateline { max-width: 100%; }
+
+  /* Comments */
+  .comment { max-width: 100%; }
+  .comment-text { max-width: 100%; }
 
   /* Profile header — smaller on mobile */
   .cover-wrap { height: 200px; }
@@ -639,15 +658,17 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
   .profile-stats { font-size: 11px; }
 
   .profile-body { flex-direction: column; }
-  .profile-sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border); }
-  .profile-tabs { padding: 0 12px; overflow-x: auto; }
+  .profile-main { padding: 14px 10px; min-width: 0; max-width: 100%; }
+  .profile-sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 0 10px; }
+  .profile-tabs { padding: 0 10px; overflow-x: auto; }
   .ptab { font-size: 12px; padding: 8px 10px; white-space: nowrap; }
 
-  .global-header { padding: 16px 16px 12px; }
+  .global-header { padding: 14px 12px 10px; }
   .global-header h2 { font-size: 18px; }
 
-  .feed-card { padding: 14px 14px; }
-  .modal-box { margin: 0; border-radius: 0; max-width: 100%; }
+  /* Modals full-screen on mobile */
+  .modal-box { margin: 0; border-radius: 0; max-width: 100%; width: 100%; padding: 14px; }
+  .modal-post-body { max-width: 100%; }
 
   /* Welcome modal */
   .welcome-box { max-width: 92vw; padding: 28px 20px; }
