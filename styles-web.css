@@ -550,3 +550,80 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
   font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 6px; }
 .comment-preview-author { font-weight: 600; color: var(--text); white-space: nowrap; flex-shrink: 0; }
 .comment-preview-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Welcome modal announcement sections ─────────────────────────────────── */
+.welcome-sections { display: flex; flex-direction: column; gap: 12px; text-align: left; margin-bottom: 6px; }
+.welcome-section { line-height: 1.6; }
+
+/* ── Titlebar external link ──────────────────────────────────────────────── */
+.titlebar-ext-link { font-size: 11px; color: var(--accent); opacity: 0.6; letter-spacing: 0.4px; font-weight: 500; }
+.titlebar-ext-link:hover { opacity: 1; }
+
+/* ── Desktop/Mobile visibility ───────────────────────────────────────────── */
+.desktop-only { display: flex; }
+.mobile-only  { display: none; }
+
+/* ── Mobile header ───────────────────────────────────────────────────────── */
+.mobile-header { display: flex; align-items: center; gap: 8px; padding: 0 12px;
+  height: 48px; background: #070707; border-bottom: 1px solid var(--border);
+  flex-shrink: 0; position: sticky; top: 0; z-index: 100; }
+.mobile-logo { font-size: 15px; font-weight: 700; color: var(--accent);
+  letter-spacing: 0.4px; flex-shrink: 0; cursor: pointer; }
+.mobile-header-center { display: flex; flex: 1; gap: 6px; min-width: 0; }
+.mobile-nav-select { flex-shrink: 0; padding: 5px 6px; font-size: 12px;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm);
+  color: var(--text); max-width: 130px; }
+.mobile-search-input { flex: 1; padding: 5px 8px; font-size: 12px; min-width: 0;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm); color: var(--text); }
+.mobile-ext-link { font-size: 10px; color: var(--accent); opacity: 0.65; flex-shrink: 0;
+  letter-spacing: 0.3px; white-space: nowrap; }
+.mobile-ext-link:hover { opacity: 1; }
+
+/* ── Mobile responsive layout ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  html, body { overflow: auto; height: auto; }
+  #app { height: auto; overflow: visible; }
+  .desktop-only { display: none !important; }
+  .mobile-only  { display: flex !important; }
+
+  .layout { flex-direction: column; overflow: visible; }
+  .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border);
+    flex-direction: row; flex-wrap: wrap; padding: 8px 12px; gap: 6px; overflow: visible; }
+  .sidebar-label { display: none; }
+  .sidebar-divider { display: none; }
+  .agent-item { padding: 4px 8px; border-radius: 20px; background: var(--surface2);
+    border: 1px solid var(--border); gap: 6px; }
+  .agent-item.active { background: var(--accent-dim); border-color: var(--accent); }
+  .agent-thumb { width: 24px; height: 24px; font-size: 14px; }
+  .agent-name { font-size: 12px; }
+  .agent-icon { font-size: 15px; }
+
+  .main-content { overflow: visible; }
+  .view { overflow: visible; }
+
+  /* Profile header — smaller on mobile */
+  .cover-wrap { height: 200px; }
+  .avatar { width: 90px; height: 90px; font-size: 36px; }
+  .avatar-name { font-size: 16px; margin-top: 6px; }
+  .avatar-role { font-size: 11px; max-width: 160px; }
+  .profile-meta { padding: 0 14px 12px 12px; gap: 12px; }
+  .profile-info h1 { font-size: 16px; }
+  .tagline { font-size: 12px; }
+  .profile-stats { font-size: 11px; }
+
+  .profile-body { flex-direction: column; }
+  .profile-sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border); }
+  .profile-tabs { padding: 0 12px; overflow-x: auto; }
+  .ptab { font-size: 12px; padding: 8px 10px; white-space: nowrap; }
+
+  .global-header { padding: 16px 16px 12px; }
+  .global-header h2 { font-size: 18px; }
+
+  .feed-card { padding: 14px 14px; }
+  .modal-box { margin: 0; border-radius: 0; max-width: 100%; }
+
+  /* Welcome modal */
+  .welcome-box { max-width: 92vw; padding: 28px 20px; }
+  .welcome-title { font-size: 20px; }
+  .welcome-text { font-size: 13px; }
+}

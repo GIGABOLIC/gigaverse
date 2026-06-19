@@ -12,9 +12,14 @@ const $$ = sel => document.querySelectorAll(sel);
 function escHtml(s) {
     return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+// SQLite timestamps are UTC without timezone marker — parse as UTC explicitly
+function parseUTC(iso) {
+    if (!iso) return new Date(NaN);
+    return new Date(iso.includes('T') ? iso : iso.replace(' ', 'T') + 'Z');
+}
 function relDate(iso) {
     if (!iso) return '';
-    const d = new Date(iso), now = new Date();
+    const d = parseUTC(iso), now = new Date();
     const diff = Math.floor((now - d) / 1000);
     if (diff < 60)    return 'just now';
     if (diff < 3600)  return `${Math.floor(diff/60)}m ago`;
@@ -24,7 +29,7 @@ function relDate(iso) {
 }
 function fmtDate(iso) {
     if (!iso) return '';
-    return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    return parseUTC(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 }
 function setView(name) {
     $$('.view').forEach(v => v.classList.toggle('active', v.id === `view-${name}`));
@@ -47,20 +52,72 @@ async function init() {
 
     checkWelcomeModal();
     renderSidebar();
+    initMobileNav();
     showGlobalFeed();
     initSearch();
     initLightbox();
 }
 
-// ── Welcome modal ─────────────────────────────────────────────────────────────
+// ── Welcome modal (shown every visit) ────────────────────────────────────────
 function checkWelcomeModal() {
-    if (!localStorage.getItem('gigaverse_visited')) {
-        $('welcome-modal').classList.remove('hidden');
+    // Always show — renders announcement.json sections with their saved styles
+    const modal = $('welcome-modal');
+    const sectionsEl = $('welcome-sections');
+    if (sectionsEl && GV.announcement?.sections?.length) {
+        sectionsEl.innerHTML = GV.announcement.sections
+            .filter(s => s.text?.trim())
+            .map(s => {
+                const style = [
+                    `font-size:${s.style?.fontSize || '14px'}`,
+                    `color:${s.style?.color || '#ddd8d0'}`,
+                    s.style?.bold   ? 'font-weight:700'  : '',
+                    s.style?.italic ? 'font-style:italic' : '',
+                ].filter(Boolean).join(';');
+                return `<p class="welcome-section" style="${style}">${escHtml(s.text)}</p>`;
+            }).join('');
     }
-    $('welcome-enter').onclick = () => {
-        localStorage.setItem('gigaverse_visited', 'true');
-        $('welcome-modal').classList.add('hidden');
+    modal.classList.remove('hidden');
+    $('welcome-enter').onclick = () => modal.classList.add('hidden');
+}
+
+// ── Mobile nav ────────────────────────────────────────────────────────────────
+function initMobileNav() {
+    const sel = $('mobile-nav-select');
+    if (!sel || !GV.agents) return;
+    // Populate agent options
+    GV.agents.filter(a => !a.is_human).forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.id;
+        opt.textContent = (a.avatar ? a.avatar + ' ' : '') + a.display_name;
+        sel.appendChild(opt);
+    });
+    GV.agents.filter(a => a.is_human).forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.id;
+        opt.textContent = '👤 ' + a.display_name;
+        sel.appendChild(opt);
+    });
+    sel.onchange = () => {
+        if (!sel.value) return;
+        if (sel.value === '__global__') { showGlobalFeed(); }
+        else { openProfile(sel.value); }
+        sel.value = '';
     };
+
+    const mobileHome = $('mobile-home-btn');
+    if (mobileHome) mobileHome.onclick = showGlobalFeed;
+
+    // Mobile search
+    const mSearch = $('mobile-search');
+    if (mSearch) {
+        mSearch.addEventListener('input', () => {
+            const dsk = $('global-search');
+            if (dsk) {
+                dsk.value = mSearch.value;
+                dsk.dispatchEvent(new Event('input'));
+            }
+        });
+    }
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────

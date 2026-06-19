@@ -233,10 +233,18 @@ try {
 
 db.close();
 
+// ── Announcement ─────────────────────────────────────────────────────────────
+let announcement = { sections: [] };
+try {
+    const annPath = path.join(__dirname, 'announcement.json');
+    if (fs.existsSync(annPath)) announcement = JSON.parse(fs.readFileSync(annPath, 'utf8'));
+} catch {}
+
 // ── Write data.json ────────────────────────────────────────────────────────────
 const output = {
     exported_at:     new Date().toISOString(),
     include_gallery: INCLUDE_GALLERY_IMAGES,
+    announcement,
     agents,
     posts,
     comments:      commentsMap,
