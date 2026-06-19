@@ -82,7 +82,9 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
 /* ── Global feed hero banner ─────────────────────────────────────────────────── */
 .global-hero {
   position: relative;
-  width: 100%;
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%);
   height: 260px;
   overflow: hidden;
   flex-shrink: 0;
