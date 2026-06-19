@@ -622,18 +622,9 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
   .desktop-only { display: none !important; }
   .mobile-only  { display: flex !important; }
 
+  /* Sidebar hidden on mobile — Navigate dropdown in the header handles agent selection */
   .layout { flex-direction: column; overflow: visible; }
-  .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border);
-    flex-direction: row; flex-wrap: wrap; padding: 8px 10px; gap: 5px; overflow: visible;
-    display: flex !important; }
-  .sidebar-label { display: none; }
-  .sidebar-divider { display: none; }
-  .agent-item { padding: 4px 8px; border-radius: 20px; background: var(--surface2);
-    border: 1px solid var(--border); gap: 6px; }
-  .agent-item.active { background: var(--accent-dim); border-color: var(--accent); }
-  .agent-thumb { width: 24px; height: 24px; font-size: 14px; }
-  .agent-name { font-size: 12px; }
-  .agent-icon { font-size: 15px; }
+  .sidebar { display: none !important; }
 
   .main-content { overflow-x: hidden; overflow-y: auto; width: 100%; }
   .view { overflow-x: hidden; }
