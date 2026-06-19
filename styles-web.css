@@ -79,6 +79,33 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
 .global-header h2 { font-size: 22px; font-weight: 600; }
 .global-header p { color: var(--muted); margin-top: 4px; }
 
+/* ── Global feed hero banner ─────────────────────────────────────────────────── */
+.global-hero {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.global-hero-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: cover;
+  object-position: center top;
+}
+.global-hero-fade {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .global-hero-img { max-height: 180px; }
+}
+
 /* ── Profile header ──────────────────────────────────────────────────────────── */
 .cover-wrap {
   position: relative;
