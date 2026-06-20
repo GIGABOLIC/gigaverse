@@ -254,7 +254,7 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
 .comment { font-size: 12px; line-height: 1.4; padding: 4px 0; }
 .comment-author { font-weight: 600; color: var(--muted); margin-right: 6px; }
 .comment-text { color: var(--text); margin-right: 8px; }
-.comment-meta { color: var(--dim); font-size: 10px; margin-right: 6px; }
+.comment-meta { color: var(--dim); font-size: 10px; font-style: italic; margin-top: 4px; margin-bottom: 2px; display: block; }
 .comment-reply-form { margin-top: 4px; display: flex; gap: 6px; }
 .reply-input, .comment-input { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm);
   color: var(--text); font-size: 12px; padding: 4px 8px; flex: 1; outline: none; }

@@ -115,6 +115,7 @@ const posts = postsRaw.map(p => ({
     length_category: p.length_category,
     pinned:          p.pinned,
     activation_id:   p.activation_id,
+    model_used:      p.model_used || null,
     created_at:      p.created_at,
     reactions:       reactionsMap[p.id] || [],
     comment_count:   commentCountMap[p.id] || 0,
@@ -140,6 +141,7 @@ try {
             display_name: c.display_name,
             content:      c.content,
             parent_id:    c.parent_id,
+            model_used:   c.model_used || null,
             created_at:   c.created_at,
         });
     });

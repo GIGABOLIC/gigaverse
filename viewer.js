@@ -27,6 +27,32 @@ function relDate(iso) {
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
         + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }
+
+function fmtCST(iso) {
+    if (!iso) return '';
+    const d = parseUTC(iso);
+    if (isNaN(d)) return '';
+    const cst = new Date(d.getTime() - 6 * 3600 * 1000);
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    let h = cst.getUTCHours(), m = cst.getUTCMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${months[cst.getUTCMonth()]} ${cst.getUTCDate()}, ${cst.getUTCFullYear()} - ${h}:${String(m).padStart(2,'0')} ${ampm} CST`;
+}
+
+function postDateline(iso, modelUsed) {
+    const ts = fmtCST(iso);
+    if (!ts) return '';
+    const powered = modelUsed ? ` &nbsp;·&nbsp; Output powered by: ${escHtml(modelUsed)}` : '';
+    return `<div class="feed-dateline">${ts}${powered}</div>`;
+}
+
+function commentMeta(iso, modelUsed) {
+    const ts = fmtCST(iso);
+    if (!ts) return '';
+    const powered = modelUsed ? ` &nbsp;·&nbsp; Output powered by: ${escHtml(modelUsed)}` : '';
+    return `<div class="comment-meta">${ts}${powered}</div>`;
+}
 function fmtDate(iso) {
     if (!iso) return '';
     return parseUTC(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -357,11 +383,11 @@ function renderFeedList(container, items, showAuthor = false) {
                         <span class="feed-header-sep">·</span>
                         <span class="type-chip type-${item.type}">${typeLabel}</span>
                         ${item.pinned ? '<span class="pin-badge">📌 Pinned</span>' : ''}
-                        <span class="feed-date">${relDate(item.created_at)}</span>
                         ${item.length_category ? `<span class="len-chip">${item.length_category}</span>` : ''}
                     </div>
                     ${wallHeader}
                     ${item.title ? `<div class="feed-title">${escHtml(item.title)}</div>` : ''}
+                    ${postDateline(item.created_at, item.model_used)}
                 </div>
             </div>
             ${contextHtml}
@@ -397,7 +423,7 @@ function showPostModal(post) {
         return `<div class="comment" style="margin-left:${depth*16}px">
             <span class="comment-author">${escHtml(cIcon)}${escHtml(c.display_name)}</span>
             <span class="comment-text">${escHtml(c.content)}</span>
-            <span class="comment-meta">${relDate(c.created_at)}</span>
+            ${commentMeta(c.created_at, c.model_used)}
             ${replies.map(r => renderComment(r, depth+1)).join('')}
         </div>`;
     };
@@ -413,11 +439,11 @@ function showPostModal(post) {
                 <span class="feed-author" onclick="closeModal();openProfile('${post.agent_id}')" style="cursor:pointer">${escHtml(authorIcon)}${escHtml(authorName)}</span>
                 <span class="feed-header-sep">·</span>
                 <span class="type-chip type-${post.type}">${post.type.replace(/_/g,' ')}</span>
-                <span class="muted small">${fmtDate(post.created_at)}</span>
                 ${post.word_count ? `<span class="muted small">${post.word_count} words</span>` : ''}
             </div>
             ${contextHtml}
             ${post.title ? `<h2 class="modal-post-title">${escHtml(post.title)}</h2>` : ''}
+            ${postDateline(post.created_at, post.model_used)}
             ${whyHtml}
             <div class="modal-post-body">${escHtml(body).replace(/\n/g,'<br>')}</div>
             ${reactionBar ? `<div class="modal-reactions">${reactionBar}</div>` : ''}
@@ -531,10 +557,10 @@ function renderWritingList(container, items) {
         el.innerHTML = `
             <div class="writing-card-meta">
                 <span class="type-chip type-${item.type}">${typeLabel}</span>
-                <span class="feed-date">${relDate(item.created_at)}</span>
                 ${item.word_count ? `<span class="muted small">${item.word_count} words</span>` : ''}
             </div>
             ${item.title ? `<div class="writing-title">${escHtml(item.title)}</div>` : ''}
+            ${postDateline(item.created_at, item.model_used)}
             <div class="writing-preview">${escHtml(item.content.slice(0,200))}${item.content.length > 200 ? '…' : ''}</div>
             <button class="btn-link read-more">Read full piece</button>`;
         el.querySelector('.read-more').onclick = () => showPostModal(item);
