@@ -527,6 +527,8 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
   color: var(--muted); background: var(--surface2); border: 1px solid var(--border);
   border-radius: 12px; padding: 2px 8px; }
 .reaction-display span { font-size: 11px; }
+.reaction-tappable { cursor: pointer; }
+.reaction-tappable:hover, .reaction-tappable:active { border-color: #888; color: #eee; }
 .comment-count-badge { font-size: 12px; color: var(--muted); }
 
 /* Modal reactions */

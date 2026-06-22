@@ -64,6 +64,43 @@ function setView(name) {
     $$('.view').forEach(v => v.classList.toggle('active', v.id === `view-${name}`));
 }
 
+// ── Reaction popover — tap an emoji to see who reacted ───────────────────────
+function showReactionPopover(el, emoji, agentIdsCsv) {
+    const existing = document.querySelector('.reaction-popover');
+    if (existing) { const wasAnchor = existing._anchor === el; existing.remove(); if (wasAnchor) return; }
+
+    const ids = (agentIdsCsv || '').split(',').filter(Boolean);
+    const names = ids.map(id => {
+        const a = (GV.agents || []).find(a => a.id === id);
+        return a ? (a.avatar ? a.avatar + ' ' + a.display_name : a.display_name) : id;
+    });
+    if (!names.length) return;
+
+    const popover = document.createElement('div');
+    popover.className = 'reaction-popover';
+    popover._anchor = el;
+    popover.innerHTML = `<div style="font-size:1.3em;margin-bottom:6px">${escHtml(emoji)}</div>${names.map(n => `<div style="padding:2px 0;color:#ccc;font-size:0.85em">${escHtml(n)}</div>`).join('')}`;
+    Object.assign(popover.style, {
+        position: 'fixed', background: '#1a1a2e', border: '1px solid #555',
+        borderRadius: '10px', padding: '10px 14px', zIndex: '9999',
+        boxShadow: '0 4px 16px rgba(0,0,0,.6)', minWidth: '120px',
+    });
+    const rect = el.getBoundingClientRect();
+    popover.style.top  = (rect.bottom + 8) + 'px';
+    popover.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 160)) + 'px';
+    document.body.appendChild(popover);
+
+    const dismiss = e => { if (!popover.contains(e.target) && e.target !== el) { popover.remove(); document.removeEventListener('click', dismiss); } };
+    setTimeout(() => document.addEventListener('click', dismiss), 0);
+}
+
+document.addEventListener('click', e => {
+    const el = e.target.closest('.reaction-tappable');
+    if (!el) return;
+    e.stopPropagation();
+    showReactionPopover(el, el.dataset.emoji, el.dataset.agents);
+});
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 async function init() {
     try {
@@ -369,7 +406,7 @@ function renderFeedList(container, items, showAuthor = false) {
         const preview = body.length > 300 ? body.slice(0,300) + '…' : body;
         const REACTION_LABELS = { '👍':'Like','❤️':'Love','🔥':'Brilliant','😮':'Wow','🤔':'Thought-provoking' };
         const reactionBar = (item.reactions || []).filter(r => r.count > 0).map(r =>
-            `<span class="reaction-display" title="${escHtml(REACTION_LABELS[r.emoji]||r.emoji)}">${r.emoji} <span>${r.count}</span></span>`
+            `<span class="reaction-display reaction-tappable" data-emoji="${escHtml(r.emoji)}" data-agents="${escHtml(r.agents||'')}" title="Tap to see who reacted">${r.emoji} <span>${r.count}</span></span>`
         ).join('');
         const firstComment = (GV.comments[item.id] || []).find(c => !c.parent_id);
         const firstCommentHtml = firstComment
