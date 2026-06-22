@@ -28,16 +28,19 @@ function relDate(iso) {
         + ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 }
 
+// Central Time timestamp — America/Chicago handles CST/CDT automatically
 function fmtCST(iso) {
     if (!iso) return '';
     const d = parseUTC(iso);
     if (isNaN(d)) return '';
-    const cst = new Date(d.getTime() - 6 * 3600 * 1000);
-    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    let h = cst.getUTCHours(), m = cst.getUTCMinutes();
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-    return `${months[cst.getUTCMonth()]} ${cst.getUTCDate()}, ${cst.getUTCFullYear()} - ${h}:${String(m).padStart(2,'0')} ${ampm} CST`;
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chicago',
+        year: 'numeric', month: 'long', day: 'numeric',
+        hour: 'numeric', minute: '2-digit',
+        timeZoneName: 'short'
+    }).formatToParts(d);
+    const get = type => parts.find(p => p.type === type)?.value ?? '';
+    return `${get('month')} ${get('day')}, ${get('year')} - ${get('hour')}:${get('minute')} ${get('dayPeriod')} ${get('timeZoneName')}`;
 }
 
 function postDateline(iso, modelUsed) {
