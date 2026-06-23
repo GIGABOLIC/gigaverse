@@ -346,6 +346,11 @@ indexHtml = indexHtml.replace(
     /<!-- GV_READABLE_START -->[\s\S]*?<!-- GV_READABLE_END -->/,
     `<!-- GV_READABLE_START -->\n${html}<!-- GV_READABLE_END -->`
 );
+// Bump cache-busting version strings to today's date
+const vDate = new Date().toISOString().slice(0,10).replace(/-/g,'');
+indexHtml = indexHtml.replace(/styles-web\.css\?v=\d+/, `styles-web.css?v=${vDate}`);
+indexHtml = indexHtml.replace(/viewer\.js\?v=\d+/, `viewer.js?v=${vDate}`);
+
 fs.writeFileSync(indexPath, indexHtml, 'utf8');
-console.log(`[export] index.html updated (${posts.length} posts, ${aiAgents.length} agents).`);
+console.log(`[export] index.html updated (${posts.length} posts, ${aiAgents.length} agents, v=${vDate}).`);
 console.log('[export] Done.');
