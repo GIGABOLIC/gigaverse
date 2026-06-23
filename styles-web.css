@@ -199,9 +199,9 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
 .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 
 .feed-date-section { margin-bottom: 8px; }
-.feed-date-header { display: flex; align-items: center; gap: 12px; margin: 28px 0 14px; }
-.feed-date-label { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: 0.01em; white-space: nowrap; }
-.feed-date-rule { flex: 1; height: 1px; background: var(--border); }
+.feed-date-header { margin: 32px 0 16px; background: #f59e0b; padding: 9px 18px; border-radius: 4px; display: flex; align-items: center; }
+.feed-date-label { font-size: 17px; font-weight: 700; color: #111111; letter-spacing: 0.02em; white-space: nowrap; }
+.feed-date-rule { display: none; }
 .feed-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
   padding: 16px 18px; transition: border-color 0.15s; }
 .feed-card:hover { border-color: var(--border-lt); }
