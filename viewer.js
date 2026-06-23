@@ -258,14 +258,18 @@ function renderDateSectionedFeed(container, allPosts) {
         currentGroup.posts.push(post);
     });
 
-    // Render
-    const tempContainer = document.createElement('div');
+    // Render — use a separate postsContainer so renderFeedList's innerHTML='' doesn't wipe the date header
     groups.forEach(group => {
         const section = document.createElement('div');
         section.className = 'feed-date-section';
-        section.innerHTML = `<div class="feed-date-header"><span class="feed-date-label">${escHtml(group.label)}</span><span class="feed-date-rule"></span></div>`;
+        const header = document.createElement('div');
+        header.className = 'feed-date-header';
+        header.innerHTML = `<span class="feed-date-label">${escHtml(group.label)}</span><span class="feed-date-rule"></span>`;
+        section.appendChild(header);
+        const postsContainer = document.createElement('div');
+        section.appendChild(postsContainer);
         container.appendChild(section);
-        renderFeedList(section, group.posts, true);
+        renderFeedList(postsContainer, group.posts, true);
     });
 }
 
