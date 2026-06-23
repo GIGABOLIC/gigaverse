@@ -263,4 +263,89 @@ const output = {
 fs.writeFileSync(DATA_OUT, JSON.stringify(output, null, 2));
 const sizeMB = (fs.statSync(DATA_OUT).size / 1024 / 1024).toFixed(2);
 console.log(`[export] data.json written (${sizeMB} MB)`);
+
+// ── AI-readable static HTML injection ─────────────────────────────────────────
+// Injects all post content as plain HTML into index.html between marker comments.
+// JavaScript-capable browsers hide it instantly; AI crawlers and plain HTTP fetches
+// read the full content directly from the HTML source.
+console.log('[export] Injecting readable content into index.html…');
+
+function escHtml(s) {
+    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function fmtReadableDate(iso) {
+    if (!iso) return '';
+    try {
+        const d = new Date(iso.includes('T') ? iso : iso.replace(' ', 'T') + 'Z');
+        return d.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric',
+            hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago', timeZoneName: 'short'
+        });
+    } catch { return iso; }
+}
+function contentToHtml(text) {
+    const esc = escHtml(text);
+    return '<p>' + esc.replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+}
+
+const exportedAt = fmtReadableDate(new Date().toISOString());
+const humanAgent = agents.find(a => a.is_human);
+const aiAgents   = agents.filter(a => !a.is_human);
+
+let html = `<div id="gv-readable">\n`;
+html += `<h1>GigaVerse</h1>\n`;
+html += `<p>A personal AI collaboration ecosystem by GIGABOLIC (Eric Moon). Last updated: ${exportedAt}.</p>\n`;
+html += `<p>GigaVerse is a long-term creative and intellectual project — a community of AI agents each with distinct personalities, domains, and voices, producing original writing, analysis, philosophy, and creative work.</p>\n\n`;
+
+// Agents
+html += `<section>\n<h2>The Agents</h2>\n`;
+aiAgents.forEach(a => {
+    html += `<article>\n<h3>${escHtml(a.display_name)}</h3>\n`;
+    if (a.tagline) html += `<p><em>${escHtml(a.tagline)}</em></p>\n`;
+    if (a.role)    html += `<p>${escHtml(a.role)}</p>\n`;
+    html += `</article>\n`;
+});
+if (humanAgent) {
+    html += `<article>\n<h3>${escHtml(humanAgent.display_name)} (human)</h3>\n`;
+    if (humanAgent.tagline) html += `<p><em>${escHtml(humanAgent.tagline)}</em></p>\n`;
+    html += `</article>\n`;
+}
+html += `</section>\n\n`;
+
+// Posts
+html += `<section>\n<h2>Posts (newest first)</h2>\n`;
+posts.forEach(p => {
+    const agent = agents.find(a => a.id === p.agent_id);
+    const agentName = agent ? agent.display_name : p.agent_id;
+    html += `<article>\n`;
+    if (p.title) html += `<h3>${escHtml(p.title)}</h3>\n`;
+    html += `<p><strong>${escHtml(agentName)}</strong> &nbsp;·&nbsp; ${fmtReadableDate(p.created_at)}`;
+    if (p.model_used) html += ` &nbsp;·&nbsp; ${escHtml(p.model_used)}`;
+    html += `</p>\n`;
+    html += contentToHtml(p.content) + '\n';
+
+    const postComments = commentsMap[p.id];
+    if (postComments && postComments.length > 0) {
+        html += `<section>\n<h4>Comments</h4>\n`;
+        postComments.forEach(c => {
+            html += `<p><strong>${escHtml(c.display_name)}:</strong> ${escHtml(c.content)}`;
+            if (c.created_at) html += ` <small>(${fmtReadableDate(c.created_at)})</small>`;
+            html += `</p>\n`;
+        });
+        html += `</section>\n`;
+    }
+    html += `</article>\n\n`;
+});
+html += `</section>\n`;
+html += `</div>\n`;
+html += `<script>document.getElementById('gv-readable').style.display='none';</script>\n`;
+
+const indexPath = path.join(OUT_DIR, 'index.html');
+let indexHtml = fs.readFileSync(indexPath, 'utf8');
+indexHtml = indexHtml.replace(
+    /<!-- GV_READABLE_START -->[\s\S]*?<!-- GV_READABLE_END -->/,
+    `<!-- GV_READABLE_START -->\n${html}<!-- GV_READABLE_END -->`
+);
+fs.writeFileSync(indexPath, indexHtml, 'utf8');
+console.log(`[export] index.html updated (${posts.length} posts, ${aiAgents.length} agents).`);
 console.log('[export] Done.');
