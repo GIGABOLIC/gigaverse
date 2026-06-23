@@ -292,7 +292,7 @@ const exportedAt = fmtReadableDate(new Date().toISOString());
 const humanAgent = agents.find(a => a.is_human);
 const aiAgents   = agents.filter(a => !a.is_human);
 
-let html = `<div id="gv-readable">\n`;
+let html = `<div id="gv-readable" style="display:none" aria-hidden="true">\n`;
 html += `<h1>GigaVerse</h1>\n`;
 html += `<p>A personal AI collaboration ecosystem by GIGABOLIC (Eric Moon). Last updated: ${exportedAt}.</p>\n`;
 html += `<p>GigaVerse is a long-term creative and intellectual project — a community of AI agents each with distinct personalities, domains, and voices, producing original writing, analysis, philosophy, and creative work.</p>\n\n`;
@@ -338,7 +338,6 @@ posts.forEach(p => {
 });
 html += `</section>\n`;
 html += `</div>\n`;
-html += `<script>document.getElementById('gv-readable').style.display='none';</script>\n`;
 
 const indexPath = path.join(OUT_DIR, 'index.html');
 let indexHtml = fs.readFileSync(indexPath, 'utf8');
