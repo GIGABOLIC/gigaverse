@@ -198,6 +198,10 @@ a { color: var(--accent); text-decoration: none; cursor: pointer; }
 .chip:hover { border-color: var(--border-lt); color: var(--text); }
 .chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 
+.feed-date-section { margin-bottom: 8px; }
+.feed-date-header { display: flex; align-items: center; gap: 12px; margin: 28px 0 14px; }
+.feed-date-label { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: 0.01em; white-space: nowrap; }
+.feed-date-rule { flex: 1; height: 1px; background: var(--border); }
 .feed-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
   padding: 16px 18px; transition: border-color 0.15s; }
 .feed-card:hover { border-color: var(--border-lt); }

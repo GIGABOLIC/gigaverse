@@ -219,7 +219,54 @@ function showGlobalFeed() {
     document.documentElement.style.removeProperty('--accent');
     document.documentElement.style.removeProperty('--accent-dim');
     document.documentElement.style.removeProperty('--accent-h');
-    renderFeedList($('global-feed'), GV.posts, true);
+    renderDateSectionedFeed($('global-feed'), GV.posts);
+}
+
+function renderDateSectionedFeed(container, allPosts) {
+    container.innerHTML = '';
+    if (!allPosts.length) { container.innerHTML = '<div class="empty-msg">Nothing here yet.</div>'; return; }
+
+    // Group by Central Time date, most recent date first, chronological within each day
+    const toCST = iso => {
+        const d = parseUTC(iso);
+        if (isNaN(d)) return '1970-01-01';
+        return d.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // 'en-CA' gives YYYY-MM-DD
+    };
+    const dateLabel = iso => {
+        const d = parseUTC(iso);
+        if (isNaN(d)) return '';
+        return d.toLocaleDateString('en-US', { timeZone: 'America/Chicago', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    };
+
+    // Sort: most recent date first; within same date, oldest post first
+    const sorted = [...allPosts].sort((a, b) => {
+        const da = toCST(a.created_at), db = toCST(b.created_at);
+        if (da !== db) return da > db ? -1 : 1; // newer date first
+        return parseUTC(a.created_at) - parseUTC(b.created_at); // chronological within day
+    });
+
+    // Group by date
+    const groups = [];
+    let currentDate = null, currentGroup = null;
+    sorted.forEach(post => {
+        const d = toCST(post.created_at);
+        if (d !== currentDate) {
+            currentDate = d;
+            currentGroup = { date: d, label: dateLabel(post.created_at), posts: [] };
+            groups.push(currentGroup);
+        }
+        currentGroup.posts.push(post);
+    });
+
+    // Render
+    const tempContainer = document.createElement('div');
+    groups.forEach(group => {
+        const section = document.createElement('div');
+        section.className = 'feed-date-section';
+        section.innerHTML = `<div class="feed-date-header"><span class="feed-date-label">${escHtml(group.label)}</span><span class="feed-date-rule"></span></div>`;
+        container.appendChild(section);
+        renderFeedList(section, group.posts, true);
+    });
 }
 
 // ── Profile view ──────────────────────────────────────────────────────────────
